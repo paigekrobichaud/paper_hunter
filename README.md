@@ -1,6 +1,4 @@
 # Paper Hunter
-<<<<<<< HEAD
-
 Research paper semantic search engine.
 
 ## Description
@@ -38,4 +36,4 @@ A semantic search engine for research papers.
 - RAG question answering
 - Improved interface
 
->>>>>>> 77b412b (Initial semantic search prototype)
+
