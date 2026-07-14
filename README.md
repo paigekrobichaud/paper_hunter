@@ -11,7 +11,7 @@ Given a search query, Paper Hunter finds and returns the most relevant sections 
 - Document and Chunk abstractions
 - Sentence-transformer embeddings
 - Semantic search using cosine similarity
-- Command-line queries from user
+- Command-line queries, tags from user
 - Saves chunked papers, embeddings to speed up repeated uses
 
 ## Planned improvements

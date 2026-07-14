@@ -3,16 +3,37 @@ from embeddings import get_model, embed_chunks
 from search import search_chunks
 from storage import save_chunks, load_chunks
 from pathlib import Path
+import argparse
 
 def main():
 
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        prog='paper_hunter',
+        description='Semantic search engine for research papers'
+    )
+    parser.add_argument(
+        '--rebuild',
+        action = 'store_true', 
+        help='Regenerate paper embeddings'
+        )
+    parser.add_argument(
+        '--top-k',
+        action = 'store', 
+        type = int,
+        default = 3,
+        help='Number of relevant paper chunks to return'
+        )
+    args = parser.parse_args()
+
+    # Load model
     print('Loading embedding model...')
     model = get_model()
 
     path = Path('../data/chunk_index.pkl')
 
-    # Check if chunks need to be created, otherwise load them 
-    if path.exists():
+    # Check if chunks need to be created or rebuilt, otherwise load them 
+    if path.exists() and not args.rebuild:
         print('Loading cached data...\n')
         chunks = load_chunks(path)
     else:
@@ -28,15 +49,16 @@ def main():
         chunks = embed_chunks(chunks=chunks, model=model)
         save_chunks(chunks,path)
 
+    # Get query and return relevant chunks
     while True:
-        query = input('Key word(s) search (\'quit\' to exit): ')
+        query = input('Search query (\'quit\' to exit): ')
         
         if query.lower().strip() == 'quit':
             break
         if not query.strip():
             continue    
         
-        relevant_chunks = search_chunks(query=query,chunks=chunks,model=model,top_k=3)
+        relevant_chunks = search_chunks(query=query,chunks=chunks,model=model,top_k=args.top_k)
 
         for ch, score in relevant_chunks:
             print(f'Article title: {ch.doc.title}\n')
