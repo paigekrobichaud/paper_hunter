@@ -2,6 +2,7 @@ from ingest import find_pdfs, load_doc, chunk_doc
 from embeddings import get_model, embed_chunks
 from search import search_chunks
 from storage import save_chunks, load_chunks
+from zotero_client import zot_client, get_zot_pdfs, download_zot_pdfs
 from pathlib import Path
 import argparse
 
@@ -24,6 +25,11 @@ def main():
         default = 3,
         help='Number of relevant paper chunks to return'
         )
+    parser.add_argument(
+        '--zotero',
+        action = 'store_true',
+        help='Download papers from Zotero'
+    )
     args = parser.parse_args()
 
     # Load model
@@ -37,10 +43,19 @@ def main():
         print('Loading cached data...\n')
         chunks = load_chunks(path)
     else:
-        print('Reading papers and embedding data...\n')
+        if args.zotero:
+            print('Reading papers from Zotero...\n')
+            zot = zot_client()
+            pdfs = get_zot_pdfs(zot)
+            papers = download_zot_pdfs(zot, pdfs)
+        else:
+            print('Reading papers from local folder...\n')
+            papers = find_pdfs()
+        
         path.parent.mkdir(parents=True, exist_ok=True)
-        papers = find_pdfs()
         chunks = []
+
+        print('Embedding data...\n')
 
         for paper in papers:
             doc = load_doc(paper)
